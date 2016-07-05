@@ -4,6 +4,8 @@ import time
 import zmq
 import logging
 
+import json
+
 _logger = logging.getLogger(__name__)
 
 class MsgQueueException(Exception):
@@ -59,9 +61,15 @@ class MsgQueue(threading.Thread):
 if __name__ == "__main__":
     mq = MsgQueue()
     mq.start()
-    mq.send("hello, world")
+    test_deal = {'stock': '002657', 'start': '2016-01-01', 'end': '2016-06-30'}
+    mq.send(json.dumps(test_deal))
     time.sleep(1)
     msg = mq.recv()
-    print msg
+    total = 0
+    for deal in json.loads(msg):
+        print deal
+        total -= float(deal['volume']) * float(deal['price'])
+        print total
+    print total
     time.sleep(10)
     mq.stop()
